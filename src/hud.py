@@ -145,7 +145,7 @@ def draw_hud(frame, m: FaceMetrics, emo: EmotionResult, calib: CalibrationState,
 
     # Status / emotion pill
     if not calib.ready:
-        _pill(frame, x + 18, y + 48, "Calibrating… hold still", bg=(80, 80, 80), fg=(255, 255, 255))
+        _pill(frame, x + 18, y + 48, "Calibrating... hold still", bg=(80, 80, 80), fg=(255, 255, 255))
     else:
         # color by emotion label
         label = emo.label.lower()
@@ -158,7 +158,7 @@ def draw_hud(frame, m: FaceMetrics, emo: EmotionResult, calib: CalibrationState,
         else:
             bg = (90, 90, 90)
 
-        _pill(frame, x + 18, y + 48, f"{emo.label}  •  {emo.confidence:.2f}", bg=bg, fg=(255, 255, 255))
+        _pill(frame, x + 18, y + 48, f"{emo.label} - {emo.confidence:.2f}", bg=bg, fg=(255, 255, 255))
 
     # Bars (tighter + cleaner)
     bx = x + 18
