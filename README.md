@@ -1,1 +1,13 @@
- # emotion-mirror
+# Design and Development of a Real-Time Emotion and Attention Analysis System Using Computer Vision
+This project presents EmotionMirror, a real-time computer-vision system that estimates facial emotion, attention, and engagement from a live webcam feed. Using OpenCV, MediaPipe Face Mesh, and NumPy, the system extracts lightweight facial metrics—such as eye openness, mouth geometry, head pose, gaze direction, and blink rate—and fuses them into intuitive, continuous signals that reflect the user’s emotional state and level of focus.
+
+A modern, glass-style heads-up display (HUD) visualizes these signals live, providing an aesthetic and responsive interface suitable for demonstrations, human–computer interaction experiments, and interactive installations.
+
+![](images/demo.gif)
+
+## Overview and Background
+Understanding human emotion and attention from visual cues is a central challenge in affective computing and human–computer interaction. Many state-of-the-art approaches rely on large deep-learning models and significant computational resources, which can limit real-time performance and accessibility. In contrast, EmotionMirror is designed as a lightweight, interpretable, and fully real-time system that runs smoothly on a standard laptop webcam without requiring specialized hardware or GPUs.
+
+The application processes the webcam stream frame by frame and uses MediaPipe Face Mesh to extract a dense set of facial landmarks for each detected face. These landmarks form the basis for a collection of geometrically motivated facial metrics that capture key aspects of facial behavior and attention. Specifically, the system computes the Eye Aspect Ratio (EAR) to estimate eye openness and detect blinks, the Mouth Aspect Ratio (MAR) and normalized mouth width to infer smiles and surprise-like expressions, approximate head yaw and pitch as a proxy for face orientation and attentiveness, and an iris-based gaze estimation measure to determine whether the user is looking toward the camera.
+
+These low-level signals are subsequently normalized and calibrated on a per-user basis to account for individual facial differences and resting expressions. The calibrated metrics are then fused into higher-level indicators such as focus and engagement, allowing the system to behave robustly across different users, lighting conditions, and camera placements while maintaining stable, real-time performance.
