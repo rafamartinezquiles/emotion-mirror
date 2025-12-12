@@ -121,33 +121,63 @@ def _progress(img, x: int, y: int, w: int, label: str, pct: float, color_fill) -
 # ---------- main HUD ----------
 
 def draw_hud(frame, m: FaceMetrics, emo: EmotionResult, calib: CalibrationState, fps: float) -> None:
+    # ---- card layout ----
     pad = 22
     card_w = 420
-    card_h = 238          # <-- was ~210, give it room
+    card_h = 285
     x, y = pad, pad
     r = 18
-    ...
+
+    # shadow + glass card
+    _drop_shadow(frame, x + 6, y + 8, card_w, card_h, r, blur=21, alpha=0.38)
+    _glass_panel(frame, x, y, card_w, card_h, r=r, tint=(18, 18, 18), alpha=0.58)
+
+    # ---- header ----
+    _text(frame, "EmotionMirror", x + 18, y + 34, 0.92, (255, 255, 255), 2, shadow=True)
+    _text(frame, f"{fps:0.0f} FPS", x + card_w - 95, y + 34, 0.55, (210, 210, 210), 1, shadow=True)
+
+    # ---- status pill (ASCII only; OpenCV Hershey can't render • or …) ----
+    pill_y = y + 48
+    if not calib.ready:
+        _pill(frame, x + 18, pill_y, "Calibrating... hold still", bg=(80, 80, 80), fg=(255, 255, 255))
+    else:
+        label = emo.label.lower()
+        if "happy" in label:
+            bg = (70, 170, 90)
+        elif "surpris" in label:
+            bg = (70, 140, 200)
+        elif "tired" in label or "concern" in label:
+            bg = (60, 90, 170)
+        else:
+            bg = (90, 90, 90)
+        _pill(frame, x + 18, pill_y, f"{emo.label} - {emo.confidence:.2f}", bg=bg, fg=(255, 255, 255))
+
+    # ---- bars ----
     bx = x + 18
     bw = card_w - 36
 
-    y0 = y + 88           # <-- bars start a bit higher
-    row = 50              # <-- fixed row spacing
+    y0 = y + 108          # bars start
+    row = 52             # space between bar rows (safe + consistent)
 
-    _progress(frame, bx, y0 + 0*row, bw, "Smile",      m.smile,      (60, 190, 230))
-    _progress(frame, bx, y0 + 1*row, bw, "Engagement", m.engagement, (90, 220, 140))
-    _progress(frame, bx, y0 + 2*row, bw, "Focus",      m.focus,      (255, 200, 90))
+    _progress(frame, bx, y0 + 0 * row, bw, "Smile",      m.smile,      (60, 190, 230))
+    _progress(frame, bx, y0 + 1 * row, bw, "Engagement", m.engagement, (90, 220, 140))
+    _progress(frame, bx, y0 + 2 * row, bw, "Focus",      m.focus,      (255, 200, 90))
 
-    # Footer separator + footer text (dedicated space)
-    footer_y = y + card_h - 18
-    cv2.line(frame, (x + 18, footer_y - 12), (x + card_w - 18, footer_y - 12), (255, 255, 255), 1, cv2.LINE_AA)
+    # ---- footer (no separator, clean spacing) ----
+    footer_text_y = y0 + 3 * row + 26   # push footer lower, no overlap
+    footer_text_y = min(footer_text_y, y + card_h - 12)
 
     g = f"Gaze: {m.gaze:.2f}"
     b = f"Blinks: {m.blink_rate:.1f}/min"
-    _text(frame, g, x + 18, footer_y, 0.46, (210, 210, 210), 1, shadow=True)
-    (tw, _), _ = cv2.getTextSize(b, cv2.FONT_HERSHEY_SIMPLEX, 0.46, 1)
-    _text(frame, b, x + card_w - 18 - tw, footer_y, 0.46, (210, 210, 210), 1, shadow=True)
 
+    _text(frame, g, x + 18, footer_text_y, 0.48, (210, 210, 210), 1, shadow=True)
+    (tw, _), _ = cv2.getTextSize(b, cv2.FONT_HERSHEY_SIMPLEX, 0.48, 1)
+    _text(frame, b, x + card_w - 18 - tw, footer_text_y, 0.48, (210, 210, 210), 1, shadow=True)
+
+
+    # ---- mini head widget (top-right of screen) ----
     _draw_head_widget(frame, m)
+
 
 
 
