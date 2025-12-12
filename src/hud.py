@@ -58,7 +58,7 @@ def _glass_panel(img, x: int, y: int, w: int, h: int, r: int = 18, tint=(20, 20,
         return
 
     roi = img[y0:y1, x0:x1].copy()
-    roi_blur = cv2.GaussianBlur(roi, (21, 21), 0)
+    roi_blur = cv2.GaussianBlur(roi, (13, 13), 0)
     tinted = np.full_like(roi_blur, tint, dtype=np.uint8)
     glass = cv2.addWeighted(roi_blur, 1.0 - alpha, tinted, alpha, 0)
 
@@ -123,53 +123,32 @@ def _progress(img, x: int, y: int, w: int, label: str, pct: float, color_fill) -
 def draw_hud(frame, m: FaceMetrics, emo: EmotionResult, calib: CalibrationState, fps: float) -> None:
     pad = 22
     card_w = 420
-    card_h = 210
+    card_h = 238          # <-- was ~210, give it room
     x, y = pad, pad
     r = 18
-
-    # shadow + glass
-    _drop_shadow(frame, x + 6, y + 8, card_w, card_h, r, blur=21, alpha=0.38)
-    _glass_panel(frame, x, y, card_w, card_h, r=r, tint=(18, 18, 18), alpha=0.58)
-
-    # Title row
-    _text(frame, "EmotionMirror", x + 18, y + 34, 0.92, (255, 255, 255), 2, shadow=True)
-    _text(frame, f"{fps:0.0f} FPS", x + card_w - 95, y + 34, 0.55, (210, 210, 210), 1, shadow=True)
-
-    # Status / emotion pill
-    if not calib.ready:
-        _pill(frame, x + 18, y + 48, "Calibrating... hold still", bg=(80, 80, 80), fg=(255, 255, 255))
-    else:
-        # color by emotion label
-        label = emo.label.lower()
-        if "happy" in label:
-            bg = (70, 170, 90)
-        elif "surpris" in label:
-            bg = (70, 140, 200)
-        elif "tired" in label or "concern" in label:
-            bg = (60, 90, 170)
-        else:
-            bg = (90, 90, 90)
-
-        _pill(frame, x + 18, y + 48, f"{emo.label} - {emo.confidence:.2f}", bg=bg, fg=(255, 255, 255))
-
-    # Bars (tighter + cleaner)
+    ...
     bx = x + 18
     bw = card_w - 36
-    y0 = y + 92
 
-    _progress(frame, bx, y0,       bw, "Smile",       m.smile,      (60, 190, 230))
-    _progress(frame, bx, y0 + 44,  bw, "Engagement",  m.engagement, (90, 220, 140))
-    _progress(frame, bx, y0 + 88,  bw, "Focus",       m.focus,      (255, 200, 90))
+    y0 = y + 88           # <-- bars start a bit higher
+    row = 50              # <-- fixed row spacing
 
-    # Footer stats
+    _progress(frame, bx, y0 + 0*row, bw, "Smile",      m.smile,      (60, 190, 230))
+    _progress(frame, bx, y0 + 1*row, bw, "Engagement", m.engagement, (90, 220, 140))
+    _progress(frame, bx, y0 + 2*row, bw, "Focus",      m.focus,      (255, 200, 90))
+
+    # Footer separator + footer text (dedicated space)
+    footer_y = y + card_h - 18
+    cv2.line(frame, (x + 18, footer_y - 12), (x + card_w - 18, footer_y - 12), (255, 255, 255), 1, cv2.LINE_AA)
+
     g = f"Gaze: {m.gaze:.2f}"
     b = f"Blinks: {m.blink_rate:.1f}/min"
-    _text(frame, g, x + 18, y + card_h - 18, 0.52, (210, 210, 210), 1, shadow=True)
-    (tw, _), _ = cv2.getTextSize(b, cv2.FONT_HERSHEY_SIMPLEX, 0.52, 1)
-    _text(frame, b, x + card_w - 18 - tw, y + card_h - 18, 0.52, (210, 210, 210), 1, shadow=True)
+    _text(frame, g, x + 18, footer_y, 0.46, (210, 210, 210), 1, shadow=True)
+    (tw, _), _ = cv2.getTextSize(b, cv2.FONT_HERSHEY_SIMPLEX, 0.46, 1)
+    _text(frame, b, x + card_w - 18 - tw, footer_y, 0.46, (210, 210, 210), 1, shadow=True)
 
-    # Mini head widget (top-right)
     _draw_head_widget(frame, m)
+
 
 
 def _draw_head_widget(frame, m: FaceMetrics) -> None:
