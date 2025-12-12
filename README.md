@@ -55,3 +55,10 @@ git clone https://github.com/rafamartinezquiles/emotion-mirror.git
 cd emotion-mirror
 pip install -r requirements.txt
 ```
+
+### Usage
+To use this project, simply run the command below. Once the camera window opens, you're ready to try product!
+
+```bash
+python -m src.main
+```
