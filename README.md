@@ -11,3 +11,19 @@ Understanding human emotion and attention from visual cues is a central challeng
 The application processes the webcam stream frame by frame and uses MediaPipe Face Mesh to extract a dense set of facial landmarks for each detected face. These landmarks form the basis for a collection of geometrically motivated facial metrics that capture key aspects of facial behavior and attention. Specifically, the system computes the Eye Aspect Ratio (EAR) to estimate eye openness and detect blinks, the Mouth Aspect Ratio (MAR) and normalized mouth width to infer smiles and surprise-like expressions, approximate head yaw and pitch as a proxy for face orientation and attentiveness, and an iris-based gaze estimation measure to determine whether the user is looking toward the camera.
 
 These low-level signals are subsequently normalized and calibrated on a per-user basis to account for individual facial differences and resting expressions. The calibrated metrics are then fused into higher-level indicators such as focus and engagement, allowing the system to behave robustly across different users, lighting conditions, and camera placements while maintaining stable, real-time performance.
+
+## Table of Contents
+```
+emotion-mirror
+|__ images
+|   |__ demo.gif
+|__ src
+    |__ __init__.py
+    |__ emotion.py
+    |__ hud.py
+    |__ main.py
+    |__ metrics.py    
+README.md
+requirements.txt
+LICENSE
+```
