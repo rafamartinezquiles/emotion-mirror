@@ -95,35 +95,27 @@ def _pill(img, x: int, y: int, text: str, bg, fg=(255, 255, 255), pad_x: int = 1
     return w, h
 
 
-def _progress(img, x: int, y: int, w: int, label: str, pct: float, color_fill, show_value: bool = True) -> None:
-    """Modern progress bar with track + fill + right-side value."""
+def _progress(img, x: int, y: int, w: int, label: str, pct: float, color_fill) -> None:
     pct = _clamp01(pct)
     track_h = 10
     r = 6
 
-    # label
+    # label (left) + value (right) on same baseline
+    val = f"{int(round(pct * 100)):d}%"
     _text(img, label, x, y, 0.52, (240, 240, 240), 1, shadow=True)
 
-    # bar geometry
-    bar_y = y + 10
-    # track
-    _rounded_rect(img, x, bar_y, w, track_h, r, (255, 255, 255), -1)
-    cv2.addWeighted(img, 0.0, img, 1.0, 0, img)  # no-op; keeps pattern consistent
+    (tw, th), _ = cv2.getTextSize(val, cv2.FONT_HERSHEY_SIMPLEX, 0.52, 1)
+    _text(img, val, x + w - tw, y, 0.52, (210, 210, 210), 1, shadow=True)
 
-    # dim track (so fill pops)
+    # bar below the text
+    bar_y = y + 10
     overlay = img.copy()
     _rounded_rect(overlay, x, bar_y, w, track_h, r, (255, 255, 255), -1)
     cv2.addWeighted(overlay, 0.10, img, 0.90, 0, img)
 
-    # fill
     fw = max(0, int(w * pct))
     if fw > 0:
         _rounded_rect(img, x, bar_y, fw, track_h, r, color_fill, -1)
-
-    if show_value:
-        val = f"{int(round(pct * 100)):d}%"
-        (tw, th), _ = cv2.getTextSize(val, cv2.FONT_HERSHEY_SIMPLEX, 0.48, 1)
-        _text(img, val, x + w - tw, bar_y + track_h + th + 6, 0.48, (220, 220, 220), 1, shadow=True)
 
 
 # ---------- main HUD ----------
